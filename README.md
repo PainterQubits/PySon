@@ -4,8 +4,6 @@
 
 Package for interfacing with Sonnet to automate designing geometries, running simulations, and post-processing data. 
 
-[sonnet.py](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/6820530f-82ee-4eb3-a688-9d6cb879d9bf/sonnet.py)
-
 ## Table of Contents
 
 - **Expand**
