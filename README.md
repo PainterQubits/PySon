@@ -6,7 +6,7 @@ Package for interfacing with Sonnet to automate designing geometries, running si
 
 ## Table of Contents
 
-- **Expand**
+
 
 ## Getting Started
 
@@ -32,7 +32,7 @@ Then simply place [pyson.py](http://pyson.py) in an accessible folder and import
 import pyson
 ```
 
-- ********************************************************Matlab engine / Sonnetlab support********************************************************
+- **Matlab engine / Sonnetlab support**
     
     Begin by downloading Sonnetlab from [here](https://www.sonnetsoftware.com/support/sonnet-suites/sonnetlab.html), rename the code’s parent directory to “sonnetlab,” and place it in the same directory as [pyson.py](http://pyson.py) for example like this:
     
@@ -76,29 +76,28 @@ open_son(file_name, sonnet_path="", temp=False, ml_backend=False, overwrite=None
 
 Opens an existing Sonnet file with a given name. Returns a PySon project.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **file_name**: str
+    **file_name: str**
     
     Name / directory of Sonnet file
     
     **sonnet_path: str, *optional***
     
-    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” ********************************************
-    
-    **********************************temp: Bool, ********optional**********
+    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” **    
+    temp: Bool, **optional**
     
     **Dangerous.** Deletes Sonnet file and all generated directories upon garbage collection. Not recommended for open_son and primarily for internal use.
     
-     **********************ml_backend: bool, ********optional**********
+     **ml_backend: bool, *optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features and may have better compatibility and stability with some Sonnet versions.
     
-    ******************************************overwrite: PySon project, ********optional**********
+    **overwrite: PySon project, *optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     pyson.open_son("project_files\\existing.son")
@@ -113,7 +112,7 @@ new_son(file_name, sonnet_path="", temp=False, ml_backend=False, overwrite=None)
 
 Creates a new Sonnet file with a given name. Returns a PySon project.
 
-- ******************Arguments******************
+- **Arguments**
     
     **file_name**: str
     
@@ -121,21 +120,21 @@ Creates a new Sonnet file with a given name. Returns a PySon project.
     
     **sonnet_path: str, *optional***
     
-    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” ********************************************
+    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” 
     
-    **********************************temp: Bool, ********optional**********
+    **temp: Bool, *optional***
     
     Deletes Sonnet file and all generated directories upon garbage collection. 
     
-     **********************ml_backend: bool, ********optional**********
+     **ml_backend: bool, *optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features (but restricts others) and may have better compatibility and stability with some Sonnet versions.
     
-    ******************************************overwrite: PySon project, ********optional**********
+    **overwrite: PySon project, *optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     pyson.new_son("project_files\\new.son")
@@ -150,7 +149,7 @@ from_template(file_name, new_file="", sonnet_path="", temp=False, ml_backend=Fal
 
 Use an existing Sonnet file as a template to create a new file. Returns a PySon project.
 
-- ******************Arguments******************
+- **Arguments**
     
     **file_name**: str
     
@@ -162,21 +161,21 @@ Use an existing Sonnet file as a template to create a new file. Returns a PySon 
     
     **sonnet_path: str, *optional***
     
-    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” ********************************************
+    Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” 
     
-    **********************************temp: Bool, ********optional**********
+    **temp: Bool, *optional***
     
     Deletes Sonnet file and all generated directories upon garbage collection. 
     
-     **********************ml_backend: bool, ********optional**********
+     **ml_backend: bool, *optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features (but restricts others) and may have better compatibility and stability with some Sonnet versions.
     
-    ******************************************overwrite: PySon project, ********optional**********
+    **overwrite: PySon project, *optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     pyson.from_template("project_files\\template.son", new_file="output_file.son")
@@ -191,13 +190,13 @@ save(file_name="")
 
 Save a PySon project to disk. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **file_name**: ************str, ********optional**********
+    **file_name**: **str, *optional***
     
     Name / directory of Sonnet project if not the same as before.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     project = pyson.new_son("new.son")
@@ -214,33 +213,33 @@ add_metal_polygon(metalization_level, xcoords, ycoords, metal_type="", tech_laye
 
 Add a metal polygon to the project. Returns a polygon id. 
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************metalization_level: int**********************************************
+    **metalization_level: int**
     
     Level to add polygon
     
-    ****************************************xcoords: array-like floats****************************************
+    **xcoords: array-like floats**
     
     List of x coordinates for vertices.
     
-    ****************************************ycoords: array-like floats****************************************
+    **ycoords: array-like floats**
     
-    List of y coordinates for vertices. ********************************************
+    List of y coordinates for vertices. **
     
-    **********************************metal_type: str, ********optional**********
+    **metal_type: str, *optional***
     
     Name of metal to use, default is lossless superconductor. 
     
-     **********************tech_layer: str, ********optional**********
+     **tech_layer: str, *optional***
     
     Name of tech layer if metal is added as part of it.
     
-    ******************************header: array-like, optional******************************
+    **header: array-like, optional**
     
     Array of overriding properties for the polygon. Primarily for internal use.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     xc = [50,150,150,50]
@@ -259,37 +258,37 @@ add_std_port(polygon, vertex, port_number=None, res=50, react=0, ind=0, cap=0)
 
 Adds a port to the selected polygon and vertex. Returns a port number. 
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************polygon: int**********************************************
+    **polygon: int**
     
     ID on which to add a port
     
-    ****************************************vertex: int****************************************
+    **vertex: int**
     
     Vertex after which to add a port i.e. vertex=2 places a port on the edge between the 2nd and 3rd vertices.
     
-    ****************************************port_number: int, ********optional**********
+    **port_number: int, *optional***
     
-    Force a certain port_number instead of incrementing by 1. ********************************************
+    Force a certain port_number instead of incrementing by 1. **
     
-    **********************************res: float, ********optional**********
+    **res: float, *optional***
     
     Port resistance. 
     
-    **********************************react: float, ********optional**********
+    **react: float, *optional***
     
     Port reactance. 
     
-    **********************************ind: float, ********optional**********
+    **ind: float, *optional***
     
     Port inductance. 
     
-    **********************************cap: float, ********optional**********
+    **cap: float, *optional***
     
     Port capacitance. 
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     xc = [50,150,150,50]
@@ -309,13 +308,13 @@ delete_polygon(index)
 
 Deletes a polygon, supported only in Python backend. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************index: int**********************************************
+    **index: int**
     
     Polygon ID to delete.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     box = project.add_metal_polygon(0,xc,yc)
@@ -333,7 +332,7 @@ box_size()
 
 Returns two floats (x size, y size)
 
-- ****************Examples****************
+- **Examples**
     
     ```python
     x,y = project.box_size()
@@ -348,17 +347,17 @@ change_box_size(x,y)
 
 Changes box size to specified values. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************x: float**********************************************
+    **x: float**
     
     New x size for box
     
-    ****************************************y: float****************************************
+    **y: float**
     
     New y size for box
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     project.change_box_size(200,200)
@@ -373,7 +372,7 @@ cell_size()
 
 Returns two floats (x size, y size)
 
-- ****************Examples****************
+- **Examples**
     
     ```python
     cx,cy = project.cell_size()
@@ -388,17 +387,17 @@ change_cell_size(x,y)
 
 Changes cell size to specified values. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************x: float**********************************************
+    **x: float**
     
     New cell x size
     
-    ****************************************y: float****************************************
+    **y: float**
     
     New cell y size
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     project.change_cell_size(0.1,0.1)
@@ -413,17 +412,17 @@ change_dielectric_layer_thickness(layer, thickness)
 
 Changes thickness of a specified dielectric layer. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************layer: int**********************************************
+    **layer: int**
     
     Layer index to change.
     
-    ********************thickness: float********************
+    **thickness: float**
     
     New thickness for layer
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Set the 0-th layer to be 200 units thick
@@ -439,17 +438,17 @@ set_valvar(name, value=None, vartype=None, descr=None)
 
 Set a Sonnet project variable. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************name: string**********************************************
+    **name: string**
     
     Variable to change.
     
-    ********************value: float, ********optional**********
+    **value: float, *optional***
     
     New value for layer. None ⇒ unchanged.
     
-    ************************vartype: str, ****optional******
+    **vartype: str* **
     
     Variable type as a string. None ⇒ unchanged.
     
@@ -459,11 +458,11 @@ Set a Sonnet project variable. Returns nothing.
     
     Other type strings can be found by opening the .son file as a txt and searching for valvar.
     
-    ******************descr: str, ********optional**********
+    **descr: str, *optional***
     
     Variable description. None ⇒ unchanged.
     
-- ****************Examples****************
+- **Examples**
     
     Consider the following inductor controlled by a variable:
     
@@ -488,17 +487,17 @@ add_abs_frequency_sweep(start,stop)
 
 Set an adaptive frequency sweep range. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    ************************start: float************************
+    **start: float**
     
     Sweep start frequency
     
-    ************************stop: float************************
+    **stop: float**
     
     Sweep stop frequency
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Add a sweep from 6 to 8 GHz (standard units)
@@ -514,13 +513,13 @@ set_speed(speed)
 
 Set simulation coarseness / edge meshing level, dictates speed and memory usage. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************speed: int**********************************************
+    **speed: int**
     
     Coarseness / edge meshing level (0,1,2 where 0 is finest/slowest). 
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Set coarseness / edge meshing to fine
@@ -536,13 +535,13 @@ targ_abs(resolution)
 
 Set the target number of frequencies to measure from an adaptive frequency sweep. Disabled if res_abs is enabled. Returns nothing. 
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************************resolution: int**********************************************
+    **resolution: int**
     
     Number of frequencies to target. 
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     project.targ_abs(300)
@@ -557,17 +556,17 @@ res_abs(enable, resolution)
 
 Set the desired resolution for an adaptive frequency sweep. Disables res abs. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************enable: bool**********************************
+    **enable: bool**
     
     Enable a specific resolution rather than a target number of frequencies.
     
-    **********************************************resolution: float**********************************************
+    **resolution: float**
     
     Resolution to target. 
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Set coarseness / edge meshing to fine
@@ -583,13 +582,13 @@ add_mdif_output(file_output="")
 
 Add an mdif output to simulations. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************file_output: str, ********optional**********
+    **file_output: str, *optional***
     
     MDIF file to output to. Default is $BASENAME.mdf, which is the sonnet file but with .son →.mdf.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     add_mdif_otuput("out.mdf")
@@ -604,13 +603,13 @@ rm_mdif_output(file_output="")
 
 Remove a set mdif output, however, it does not delete any files. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************file_output: str, ********optional**********
+    **file_output: str, *optional***
     
     MDIF output to remove. Default to remove is $BASENAME.mdf.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     rm_mdif_output("out.mdf")
@@ -625,13 +624,13 @@ simulate_network(file_output="")
 
 Runs a Sonnet EM simulation of the current project. Returns a Scikit-RF NetworkSet where (if a sweep hasn’t otherwise been defined) the 0-th element is the simulation network.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************file_output: str, ********optional**********
+    **file_output: str, *optional***
     
     MDIF file to output to. Default creates a temporary file that is removed afterwards.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Run a simulation from 6-8GHz and get its skrf.Network
@@ -648,17 +647,17 @@ sonnet_call_em(file_name="", options="")
 
 Run sonnet EM on a file with the given options. Generally for internal use. Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************************file_name: str, ********optional**********
+    **file_name: str, *optional***
     
     File to run EM.exe on
     
-    ****************************options: str, ********optional**********
+    **options: str, *optional***
     
     Options to run EM.exe with
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     project.sonnet_call_em(project.file_name)
@@ -675,37 +674,37 @@ draw(layer=None, metal_args=dict(color="#209fb5", edgecolor="#4c4f69", hatch="//
 
 Draws a sonnet project using matplotlib. Returns matplotlib figure and axes objects.
 
-- ******************Arguments******************
+- **Arguments**
     
-    **********************figsize: (int, int), ********optional**********
+    **figsize: (int, int), *optional***
     
     Size of plot
     
-    **********************************layer: int, ********optional**********
+    **layer: int, *optional***
     
     Layer to draw. Default is the top layer that contains metal.
     
-    ****************************metal_args: dict, ********optional**********
+    **metal_args: dict, *optional***
     
     Arguments to pass to each fill function when drawing metal.
     
-    ********************************************metal_argf: function, ********optional**********
+    **metal_argf: function, *optional***
     
     Function to run to determine each fill function’s arguments, function is passed the polygon format described in pyson.extract_polygons. Overwrites metal_args.
     
-    **************************ports: bool, ********optional**********
+    **ports: bool, *optional***
     
     Enable drawing ports
     
-    ******************************port_box: dict, ********optional**********
+    **port_box: dict, *optional***
     
     Box parameters for port. Passed to plt.text(bbox=port_box)
     
-    **********************************fontsize: float, ********optional**********
+    **fontsize: float, *optional***
     
     Port font size 
     
-- ****************Examples****************
+- **Examples**
     
     Both of these examples use the simple box / port designed in project.add_metal_polygon and project.add_std_port.
     
@@ -751,7 +750,7 @@ project.son_dict
 
 Not a function. Dictionary parses the Sonnet file and uses blocks as keys and strings for each line in the individual block. Additionally the file header is stored under “file_header” and the block “GEO” is not parsed into individual lines due to its particularly complicated nature. 
 
-- ****************Examples****************
+- **Examples**
     
     The following lines in the .son file:
     
@@ -780,7 +779,7 @@ extract_polygons(unpacked)
 
 Extract polygons from an unpacked dict of a sonnet file. Complicated return type.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
@@ -798,7 +797,7 @@ Extract polygons from an unpacked dict of a sonnet file. Complicated return type
     
     Corresponding to each polygon in the project. Question marks indicate a parameter that is not understood and is fixed to some common default.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Get the first polygon listed in the file and find its ID
@@ -815,13 +814,13 @@ extract_ports(unpacked, indices=False)
 
 Extract ports from an unpacked dict of a sonnet file. Complicated return type.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
     Dictionary corresponding to a Sonnet project.
     
-    ******************************indices: bool, ********optional**********
+    **indices: bool, *optional***
     
     Whether to return a list of line numbers corresponding to ports instead of the list of port dicts.
     
@@ -857,7 +856,7 @@ Extract ports from an unpacked dict of a sonnet file. Complicated return type.
     agnd_calib_length
     ```
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Get the first port listed in the file and get its attached polygon
@@ -874,7 +873,7 @@ extract_box(unpacked)
 
 Extract box data from an unpacked dict of a sonnet file. Complicated return type.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
@@ -890,7 +889,7 @@ Extract box data from an unpacked dict of a sonnet file. Complicated return type
     layer0 = [thickness, ?, ?, ...]
     ```
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Get the x dimension of the box
@@ -907,7 +906,7 @@ repack_geo(unpacked, polygons=None, ports=None, box=None)
 
 Repack the geometry section of an unpacked Sonnet dict. Returns a Sonnet dict.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
@@ -917,15 +916,15 @@ Repack the geometry section of an unpacked Sonnet dict. Returns a Sonnet dict.
     
     List of polygons as discussed in extract_polygons.
     
-    **********************ports: list**********************
+    **ports: list**
     
     Not implemented
     
-    ******************box: list******************
+    **box: list**
     
     Box parameters / list of layers as discussed in extract_box.
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Unpack polygons, and directly repack them doing nothing
@@ -941,21 +940,21 @@ param_exists(unpacked, block, param)
 
 Check if a certain parameter exists in a block of the Sonnet dict (see Sonnet dict documentation). Returns a boolean.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
     Dictionary corresponding to a Sonnet project
     
-    **************************block: string**************************
+    **block: string**
     
     Block of the Sonnet dict to check
     
-    **********************parameter: string**********************
+    **parameter: string**
     
     Parameter to find
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Check if a resolution block exists for frequency sweeps
@@ -971,25 +970,25 @@ param_exists(unpacked, block, param, value)
 
 Set a parameter in the Sonnet dict (see Sonnet dict documentation). Returns nothing.
 
-- ******************Arguments******************
+- **Arguments**
     
     **unpacked: dict**
     
     Dictionary corresponding to a Sonnet project
     
-    **************************block: string**************************
+    **block: string**
     
     Block of the Sonnet dict to check
     
-    **********************parameter: string**********************
+    **parameter: string**
     
     Parameter to find
     
-    ******************************************************************value: string, int, Bool or Array-like******************************************************************
+    **value: string, int, Bool or Array-like**
     
     Value to set parameter
     
-- ****************Examples****************
+- **Examples**
     
     ```python
     # Set the resolution for frequency sweeps
