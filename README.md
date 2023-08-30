@@ -82,18 +82,18 @@ Opens an existing Sonnet file with a given name. Returns a PySon project.
     
     Name / directory of Sonnet file
     
-    **sonnet_path: str, *optional***
+    **sonnet_path: str,** ***optional***
     
     Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” **    
     temp: Bool, **optional**
     
     **Dangerous.** Deletes Sonnet file and all generated directories upon garbage collection. Not recommended for open_son and primarily for internal use.
     
-     **ml_backend: bool, *optional***
+     **ml_backend: bool,** ***optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features and may have better compatibility and stability with some Sonnet versions.
     
-    **overwrite: PySon project, *optional***
+    **overwrite: PySon project,** ***optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
@@ -118,19 +118,19 @@ Creates a new Sonnet file with a given name. Returns a PySon project.
     
     Name / directory of Sonnet file
     
-    **sonnet_path: str, *optional***
+    **sonnet_path: str,** ***optional***
     
     Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” 
     
-    **temp: Bool, *optional***
+    **temp: Bool,** ***optional***
     
     Deletes Sonnet file and all generated directories upon garbage collection. 
     
-     **ml_backend: bool, *optional***
+     **ml_backend: bool,** ***optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features (but restricts others) and may have better compatibility and stability with some Sonnet versions.
     
-    **overwrite: PySon project, *optional***
+    **overwrite: PySon project,** ***optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
@@ -155,23 +155,23 @@ Use an existing Sonnet file as a template to create a new file. Returns a PySon 
     
     Name / directory of Sonnet template file
     
-    **new_file: str, *optional***
+    **new_file: str,** ***optional***
     
     Name / directory of output file. Default is {file_name}-{1,2,…}.son
     
-    **sonnet_path: str, *optional***
+    **sonnet_path: str,** ***optional***
     
     Directory for specific sonnet version. Default is C:\Program Files (x86)\Sonnet Software\16.52\bin\” 
     
-    **temp: Bool, *optional***
+    **temp: Bool,** ***optional***
     
     Deletes Sonnet file and all generated directories upon garbage collection. 
     
-     **ml_backend: bool, *optional***
+     **ml_backend: bool,** ***optional***
     
     Use Matlab / Sonnetlab backend rather than native parser. Enables some extra features (but restricts others) and may have better compatibility and stability with some Sonnet versions.
     
-    **overwrite: PySon project, *optional***
+    **overwrite: PySon project,** ***optional***
     
     Requires ml_backend. Overwrites an existing matlab engine instance rather than spawning a new one. Reduces resource overhead and speeds up project creation.
     
@@ -192,7 +192,7 @@ Save a PySon project to disk. Returns nothing.
 
 - **Arguments**
     
-    **file_name**: **str, *optional***
+    **file_name**: **str,** ***optional***
     
     Name / directory of Sonnet project if not the same as before.
     
@@ -227,11 +227,11 @@ Add a metal polygon to the project. Returns a polygon id.
     
     List of y coordinates for vertices. **
     
-    **metal_type: str, *optional***
+    **metal_type: str,** ***optional***
     
     Name of metal to use, default is lossless superconductor. 
     
-     **tech_layer: str, *optional***
+     **tech_layer: str,** ***optional***
     
     Name of tech layer if metal is added as part of it.
     
@@ -268,23 +268,23 @@ Adds a port to the selected polygon and vertex. Returns a port number.
     
     Vertex after which to add a port i.e. vertex=2 places a port on the edge between the 2nd and 3rd vertices.
     
-    **port_number: int, *optional***
+    **port_number: int,** ***optional***
     
     Force a certain port_number instead of incrementing by 1. **
     
-    **res: float, *optional***
+    **res: float,** ***optional***
     
     Port resistance. 
     
-    **react: float, *optional***
+    **react: float,** ***optional***
     
     Port reactance. 
     
-    **ind: float, *optional***
+    **ind: float,** ***optional***
     
     Port inductance. 
     
-    **cap: float, *optional***
+    **cap: float,** ***optional***
     
     Port capacitance. 
     
@@ -444,7 +444,7 @@ Set a Sonnet project variable. Returns nothing.
     
     Variable to change.
     
-    **value: float, *optional***
+    **value: float,** ***optional***
     
     New value for layer. None ⇒ unchanged.
     
@@ -458,7 +458,7 @@ Set a Sonnet project variable. Returns nothing.
     
     Other type strings can be found by opening the .son file as a txt and searching for valvar.
     
-    **descr: str, *optional***
+    **descr: str,** ***optional***
     
     Variable description. None ⇒ unchanged.
     
@@ -584,7 +584,7 @@ Add an mdif output to simulations. Returns nothing.
 
 - **Arguments**
     
-    **file_output: str, *optional***
+    **file_output: str,** ***optional***
     
     MDIF file to output to. Default is $BASENAME.mdf, which is the sonnet file but with .son →.mdf.
     
@@ -605,7 +605,7 @@ Remove a set mdif output, however, it does not delete any files. Returns nothing
 
 - **Arguments**
     
-    **file_output: str, *optional***
+    **file_output: str,** ***optional***
     
     MDIF output to remove. Default to remove is $BASENAME.mdf.
     
@@ -626,7 +626,7 @@ Runs a Sonnet EM simulation of the current project. Returns a Scikit-RF NetworkS
 
 - **Arguments**
     
-    **file_output: str, *optional***
+    **file_output: str,** ***optional***
     
     MDIF file to output to. Default creates a temporary file that is removed afterwards.
     
@@ -649,11 +649,11 @@ Run sonnet EM on a file with the given options. Generally for internal use. Retu
 
 - **Arguments**
     
-    **file_name: str, *optional***
+    **file_name: str,** ***optional***
     
     File to run EM.exe on
     
-    **options: str, *optional***
+    **options: str,** ***optional***
     
     Options to run EM.exe with
     
@@ -676,31 +676,31 @@ Draws a sonnet project using matplotlib. Returns matplotlib figure and axes obje
 
 - **Arguments**
     
-    **figsize: (int, int), *optional***
+    **figsize: (int, int),** ***optional***
     
     Size of plot
     
-    **layer: int, *optional***
+    **layer: int,** ***optional***
     
     Layer to draw. Default is the top layer that contains metal.
     
-    **metal_args: dict, *optional***
+    **metal_args: dict,** ***optional***
     
     Arguments to pass to each fill function when drawing metal.
     
-    **metal_argf: function, *optional***
+    **metal_argf: function,** ***optional***
     
     Function to run to determine each fill function’s arguments, function is passed the polygon format described in pyson.extract_polygons. Overwrites metal_args.
     
-    **ports: bool, *optional***
+    **ports: bool,** ***optional***
     
     Enable drawing ports
     
-    **port_box: dict, *optional***
+    **port_box: dict,** ***optional***
     
     Box parameters for port. Passed to plt.text(bbox=port_box)
     
-    **fontsize: float, *optional***
+    **fontsize: float,** ***optional***
     
     Port font size 
     
@@ -820,7 +820,7 @@ Extract ports from an unpacked dict of a sonnet file. Complicated return type.
     
     Dictionary corresponding to a Sonnet project.
     
-    **indices: bool, *optional***
+    **indices: bool,** ***optional***
     
     Whether to return a list of line numbers corresponding to ports instead of the list of port dicts.
     
