@@ -371,7 +371,7 @@ class sonnetFile:
         return out
 
     def sonnet_call_em(self, file_name="", options=""):
-        subprocess.call(f"{self.sonnet_path}em.exe {self.file_name}{"" if options == "" else " "}{options}")
+        subprocess.call(f"{self.sonnet_path}em.exe {self.file_name}{'' if options == '' else ' '}{options}")
 
     def targ_abs(self, resolution):
         if self.ml_backend:
