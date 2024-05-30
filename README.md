@@ -2,7 +2,9 @@
 
 ## Description
 
-Package for interfacing with Sonnet to automate designing geometries, running simulations, and post-processing data. 
+Package for interfacing with [Sonnet](https://www.sonnetsoftware.com/) to automate designing geometries, running simulations, and post-processing data.
+
+Inspired by and initially made as a wrapper to the [SonnetLab](https://www.sonnetsoftware.com/support/sonnet-suites/sonnetlab.html) MatLab library. However, SonnetLab is no longer a required dependency.
 
 ## Table of Contents
 
@@ -36,7 +38,7 @@ import pyson
     
     Begin by downloading Sonnetlab from [here](https://www.sonnetsoftware.com/support/sonnet-suites/sonnetlab.html), rename the code’s parent directory to “sonnetlab,” and place it in the same directory as [pyson.py](http://pyson.py) for example like this:
     
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/ea17a2f1-0a01-4e03-b6db-1213dfa69da9/Untitled.png)
+    ![Sonnetlab Setup](images/sonnetlab.png)
     
     Next if you are using a version of Sonnet unsupported by Sonnetlab (16.52 included!) you will need to edit SonnetPath.m to the following
     
@@ -247,7 +249,7 @@ Add a metal polygon to the project. Returns a polygon id.
     project.add_metal_polygon(0,xc,yc)
     ```
     
-    ![box.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d0bd3e66-4753-45de-a291-bf6a69282098/box.png)
+    <img src="images/box.png" width="400">
     
 
 ### project.add_std_port
@@ -297,7 +299,7 @@ Adds a port to the selected polygon and vertex. Returns a port number.
     project.add_std_port(box, 0)
     ```
     
-    ![box_port.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7885f8ec-4290-45b6-b3c3-79c332f2fba1/box_port.png)
+    <img src="images/box_port.png" width="400">
     
 
 ### project.delete_polygon
@@ -466,11 +468,11 @@ Set a Sonnet project variable. Returns nothing.
     
     Consider the following inductor controlled by a variable:
     
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/9852e9b3-8fa9-4d37-9975-d0f6c77534ac/Untitled.png)
+    ![Valvar Setup](images/valvar0.png)
     
     We can set its values to this:
     
-    ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7ca11c39-d217-4865-acac-dab0fa29f167/Untitled.png)
+    ![Valvar Changed](images/valvar1.png)
     
     Using this:
     
@@ -713,7 +715,7 @@ Draws a sonnet project using matplotlib. Returns matplotlib figure and axes obje
     fig, ax = project.draw()
     ```
     
-    ![download.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/65d7f134-cc56-4586-b2c0-f581ac787845/download.png)
+    <img src="images/draw.png" width="400">
     
     ```python
     # Fancy gray / labeled drawing using metal_argf
@@ -737,7 +739,7 @@ Draws a sonnet project using matplotlib. Returns matplotlib figure and axes obje
     ylabel("Height (µm)", fontsize=28)
     ```
     
-    ![box_port.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/7885f8ec-4290-45b6-b3c3-79c332f2fba1/box_port.png)
+    <img src="images/box_port.png" width="400">
     
 
 ## Parser Documentation
