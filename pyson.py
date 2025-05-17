@@ -1,10 +1,11 @@
 from copy import copy
 from matplotlib import pyplot as plt
-from shapely.geometry import Polygon as ShapelyPolygon
+from shapely.geometry import Polygon as ShapelyPolygon, Point
 from shapely.geometry import MultiPolygon as ShapelyMultiPolygon
 from datetime import datetime
 from random import randint, seed
 import numpy as np
+import warnings
 import skrf as rf
 import subprocess
 import shutil
@@ -18,23 +19,39 @@ except ImportError:
     ml_import = False
     pass
 
-pyson_version = 0.1
+pyson_version = 0.2
 
 class sonnetFile:
     # Constructors / Destructors
-    def __init__(self,  file_name, temp, sonnet_path="", eng=None):
-        sp = "C:\\Program Files (x86)\\Sonnet Software\\16.52\\bin\\"
+    def __init__(self,  file_name, temp, sonnet_path="", sonnet_version="", eng=None):
+        sp = ""
+        sv = "18.53"
+        if sonnet_path == "":
+            tested_versions = [sonnet_version]
+            if sonnet_version == "":
+                tested_versions = ["16.52", "18.53", "18.56"]
+            pf = ["Program Files (x86)", "Program Files"]
+            for version in tested_versions:
+                for pf0 in pf:
+                    sp = f"C:\\{pf0}\\Sonnet Software\\{version}\\bin\\"
+                    if os.path.isdir(sp):
+                        sv = version
+                        break
+                else:
+                    continue
+                break
+            else:
+                warnings.warn(f"Sonnet installation not found.")
         self.eng = eng
         self.file_name = file_name
         self.temp = temp
         self.ml_backend = eng is not None
         self.son_dict = unpack_son(file_name) 
+        self.sonnet_version = float(sv)
         if os.path.isdir(sp):
             self.sonnet_path = sp
         elif sp != "":
             self.sonnet_path = sonnet_path
-        else:
-            raise Exception("Sonnet 16.52 path not found, please specify custom path. Versions != 16.52 are untested.")
 
     def __del__(self):
         if self.temp:
@@ -138,8 +155,13 @@ class sonnetFile:
             new_header = []
             if header != []:
                 new_header = header
-                if header[2] == -1:
-                    new_header[2] = new_id
+                # This was originally header[2]? I think it should be header[4]
+                if self.sonnet_version >= 18.53:
+                    if header[4] == -1:
+                        new_header[4] = new_id
+                else:
+                    if header[2] == -1:
+                        new_header[2] = new_id
             else:
                 new_header = [metalization_level, len(xcoords), -1 if metal_type == "" else metal_type, 'N', new_id, 1, 1, 100, 100, 0, 0, 0, 'Y', tech_layer, inh]
 
@@ -150,8 +172,161 @@ class sonnetFile:
                 new_poly[1].append(new_poly[1][0])
                 new_poly[0][1] = new_poly[0][1] + 1
             polys.append(new_poly)
+            #print(polys)
             self.son_dict = repack_geo(self.son_dict, polygons=polys)
             return new_id
+
+    def set_refp(self, direction, refp_type, poly_id=None, vertex=None, rlength=None):
+        drp_list = extract_drp(self.son_dict)
+        refp_type_inner = refp_type.upper()
+
+        set_drp_dict = {'type': refp_type_inner, 'direction': direction}
+
+        drp_in_list = False
+        for drp_index in range(len(drp_list)):
+            drp = drp_list[drp_index]
+            if drp["direction"] == direction and refp_type_inner != "NONE":
+                drp_in_list = True
+                if refp_type_inner == "LINK":
+                    if poly_id is not None:
+                        set_drp_dict["poly_id"] = poly_id
+                    else:
+                        set_drp_dict["poly_id"] = drp["poly_id"]
+
+                    if vertex is not None:
+                        set_drp_dict["vertex"] = vertex
+                    else:
+                        set_drp_dict["vertex"] = drp["vertex"]
+                elif refp_type_inner == "FIX":
+                    if rlength is not None:
+                        set_drp_dict["rlength"] = rlength
+                drp_list[drp_index] = set_drp_dict
+                break
+            elif drp["direction"] == direction and refp_type_inner == "NONE":
+                drp_in_list = True
+                drp_list.pop(drp_index)
+                break
+        if not drp_in_list:
+            if refp_type_inner == "LINK":
+                if poly_id is None:
+                    raise Exception("poly_id must be specified for new LINK reference plane.")
+                set_drp_dict["poly_id"] = poly_id
+                if vertex is None:
+                    raise Exception("vertex must be specified for new LINK reference plane.")
+                set_drp_dict["vertex"] = vertex
+            elif refp_type_inner == "FIX":
+                if rlength is None:
+                    raise Exception("rlength must be specified for new FIX reference plane.")
+                set_drp_dict["rlength"] = rlength
+            drp_list.append(set_drp_dict)
+        self.son_dict = repack_geo(self.son_dict, drp=drp_list)
+
+    def add_feedline(self, poly_id, vertex, direction="", perp_sign=None, port_number=None, res=50, react=0, ind=0, cap=0, metal_type=""):
+        direction_upper = direction.upper()
+        direction_internal = direction_upper
+        polygons = extract_polygons(self.son_dict)
+        poly = [p for p in polygons if int(p[0][4]) == poly_id][0]
+        tech_layer = poly[0][-2]
+        xw, yw = self.box_size()
+        poly = [[x, yw-y] for x,y in poly[1]]
+        poly_shape = ShapelyPolygon(poly)
+        xc = [poly[vertex+i][0] for i in range(2)]
+        yc = [poly[vertex+i][1] for i in range(2)]
+        match direction_upper:
+            case "":
+                xslope = xc[1] - xc[0]
+                yslope = yc[1] - yc[0]
+                midx = xc[0] + xslope / 2
+                midy = yc[0] + yslope / 2
+                perp = [- yslope, xslope]
+                perp_sign_internal = 1
+                if perp_sign is not None:
+                    perp_sign_internal = perp_sign
+                else:
+                    pscale = 1/100
+                    for i in range(10):
+                        check_x = midx + perp[0] * pscale
+                        check_y = midy + perp[1] * pscale
+                        inv_x = midx - perp[0] * pscale
+                        inv_y = midy - perp[1] * pscale
+                        if poly_shape.contains(Point(check_x, check_y)) and not poly_shape.contains(Point(inv_x, inv_y)):
+                            perp_sign_internal = -1
+                            break
+                        if poly_shape.contains(Point(inv_x, inv_y)) and not poly_shape.contains(Point(check_x, check_y)):
+                            perp_sign_internal = 1
+                            break
+                        pscale = pscale / 2
+                    else:
+                        raise Exception("Couldn't orient feedline (try setting perp_sign).")
+                perp = [perp[0] * perp_sign_internal, perp[1] * perp_sign_internal]
+                dx = None
+                dy = None
+                # Compute vertex 3
+                wall_0 = ""
+                if perp[0] != 0:
+                    dx = (xw - xc[1])/perp[0] if perp[0] > 0 else xc[1]/(-perp[0])
+                if perp[1] != 0:
+                    dy = (yw - yc[1])/perp[1] if perp[1] > 0 else yc[1]/(-perp[1])
+                if perp[0] == 0:
+                    dx = dy + 1
+                if perp[1] == 0:
+                    dy = dx + 1
+                if dx < dy:
+                    xc.append(xw if perp[0] > 0 else 0)
+                    yc.append(yc[1] + perp[1]*dx)
+                    wall_0 = "RIGHT" if perp[0] > 0 else "LEFT"
+                else:
+                    xc.append(xc[1] + perp[0]*dy)
+                    yc.append(yw if perp[1] > 0 else 0)
+                    wall_0 = "TOP" if perp[1] > 0 else "BOTTOM"
+
+                # Compute vertex 4
+                wall_1 = ""
+                if perp[0] != 0:
+                    dx = (xw - xc[0])/perp[0] if perp[0] > 0 else xc[0]/(-perp[0])
+                if perp[1] != 0:
+                    dy = (yw - yc[0])/perp[1] if perp[1] > 0 else yc[0]/(-perp[1])
+                if perp[0] == 0:
+                    dx = dy + 1
+                if perp[1] == 0:
+                    dy = dx + 1
+                if dx < dy:
+                    xc.append(xw if perp[0] > 0 else 0)
+                    yc.append(yc[0] + perp[1]*dx)
+                    wall_1 = "RIGHT" if perp[0] > 0 else "LEFT"
+                else:
+                    xc.append(xc[0] + perp[0]*dy)
+                    yc.append(yw if perp[1] > 0 else 0)
+                    wall_1 = "TOP" if perp[1] > 0 else "BOTTOM"
+
+                if wall_0 == wall_1:
+                    direction_internal = wall_0
+                else:
+                    warnings.warn("Feedline is not aligned with the walls of the polygon.")
+
+            case "TOP":
+                xc = xc + [poly[vertex+1][0], poly[vertex][0]]
+                yc = yc + [yw, yw]
+            case "BOTTOM":
+                xc = xc + [poly[vertex+1][0], poly[vertex][0]]
+                yc = yc + [0, 0]
+            case "LEFT":
+                xc = xc + [0, 0]
+                yc = yc + [poly[vertex+1][1], poly[vertex][1]]
+            case "RIGHT":
+                xc = xc + [xw, xw]
+                yc = yc + [poly[vertex+1][1], poly[vertex][1]]
+        xc.append(xc[0])
+        yc.append(yc[0])
+        feedline_id = self.add_metal_polygon(0, xc, yc, metal_type=metal_type, tech_layer=tech_layer)
+        self.add_std_port(feedline_id, 2, port_number=port_number, res=res, react=react, ind=ind, cap=cap)
+        if direction_internal != "":
+            self.set_refp(direction_internal, "LINK", poly_id=poly_id, vertex=vertex)
+        return feedline_id
+
+
+        
+        
 
     def add_subcircuit(self, project, x, y):
         if self.ml_backend:
@@ -159,14 +334,20 @@ class sonnetFile:
         else:
             id_maps = []
             polys = extract_polygons(project.son_dict)
+            _, yw = project.box_size()
             for i in range(len(polys)):
-                old_id = polys[i][0][2]
-                polys[i][0][2] = -1
+                if self.sonnet_version >= 18.53:
+                    old_id = polys[i][0][4]
+                    polys[i][0][4] = -1
+                else:
+                    old_id = polys[i][0][2]
+                    polys[i][0][2] = -1
                 for j in range(len(polys[i][1])):
                     polys[i][1][j][0] = polys[i][1][j][0] + x
-                    polys[i][1][j][1] = polys[i][1][j][1] + y
+                    polys[i][1][j][1] = (yw-polys[i][1][j][1]) + y
                 new_id = self.add_metal_polygon(0, *zip(*polys[i][1]), header=polys[i][0])
-                id_maps.append((old_id, new_id))
+                id_maps.append((int(old_id), new_id))
+        return id_maps
 
     def set_valvar(self, name, value=None, vartype=None, Descr=None):
         geo = self.son_dict["GEO"].split("\n")
@@ -215,22 +396,22 @@ class sonnetFile:
             pn = 1 if len(port_nums) == 0 else max(port_nums)+1
             pn = port_number if port_number is not None else pn
             port_lines = []
-            port_lines.append("POR1 STD")
+            if self.sonnet_version >= 18.53:
+                port_lines.append("POR1 BOX")
+            else:
+                port_lines.append("POR1 STD")
             port_lines.append(f"POLY {polygon} 1")
             port_lines.append(f"{vertex}")
             port_lines.append(f"{pn} {res} {react} {ind} {cap} {x} {y}")
 
             geo = [y for y in (x for x in self.son_dict["GEO"].splitlines()) if y]
             port_indices = extract_ports(self.son_dict, indices=True)
-            print(port_indices)
             final_port = 0
             if len(port_indices) == 0:
-                print([i for i in range(len(geo)) if "NUM" in geo[i]])
                 polygons_start = [i for i in range(len(geo)) if "NUM" in geo[i]][0]
                 final_port = polygons_start-1
             else:
                 final_port = max(port_indices)
-            print(final_port)
             geo = geo[:final_port+1] + port_lines + geo[final_port+1:]
             self.son_dict["GEO"] = "\n".join(geo)
 
@@ -367,10 +548,13 @@ class sonnetFile:
 
         # Delete the temp file
         os.remove(fo)
+        shutil.rmtree(f"sondata\\{os.path.splitext(self.file_name)[0]}")
 
         return out
 
     def sonnet_call_em(self, file_name="", options=""):
+        if self.sonnet_path == "":
+            raise Exception("Can't call em, sonnet_path not set.")
         subprocess.call(f"{self.sonnet_path}em.exe {self.file_name}{'' if options == '' else ' '}{options}")
 
     def targ_abs(self, resolution):
@@ -475,7 +659,7 @@ class sonnetFile:
                 ids =  [int(a[0][0]) for a in extract_polygons(up)]
                 draw_layer = max(ids)
             else:
-                return ptl.figure(figsize=figsize)
+                return plt.subplots(figsize=figsize)
         # Get box size to handle coordinate shifts
         _,y = self.box_size()
         fig = plt.figure(figsize=figsize)
@@ -627,8 +811,9 @@ def extract_box(unpacked):
     del up
     return[geo_box, layers]
 
-def repack_geo(unpacked, polygons=None, ports=None, box=None):
+def repack_geo(unpacked, polygons=None, ports=None, box=None, drp=None):
     up = copy(unpacked)
+
     if polygons is not None:
         # Extract the lines relevant to polygons
         g_lines = [y for y in (x for x in unpacked["GEO"].splitlines()) if y]
@@ -646,6 +831,7 @@ def repack_geo(unpacked, polygons=None, ports=None, box=None):
         new_lines = g_lines[:polygons_start] + new_polygons
 
         # Re-insert the new polygons
+        #print(new_lines)
         up["GEO"] = "\n".join(new_lines) + "\n"
 
     if box is not None:
@@ -667,6 +853,9 @@ def repack_geo(unpacked, polygons=None, ports=None, box=None):
             if len(box[1][i]) > 8:
                 geo[box_start+i+1] = geo[box_start+i+1] + ' ' + ' '.join(map(str, box[1][i][8:]))
         up["GEO"] = "\n".join(geo) + "\n"
+
+    if drp is not None:
+        up = repack_drp(up, drp)
 
     return up
 
@@ -755,6 +944,59 @@ def extract_ports(unpacked, indices=False):
 def repack_ports(unpacked, ports):
     geo = unpacked["GEO"].splitlines()
 
+def extract_drp(unpacked):
+    g_lines = [y for y in (x.strip() for x in unpacked["GEO"].splitlines()) if y]
+    drp_headers = [i for i in range(len(g_lines)) if "DRP1" in g_lines[i]]
+
+    if len(drp_headers) == 0:
+        return []
+
+    drp_unpacked = []
+
+    for pline in drp_headers:
+        refp_lines = []
+        # Data structure for linked plane
+
+        drp_type = g_lines[pline].split(' ')[2]
+        drp_dict = {}
+        if drp_type == "LINK":
+            drp_lines = [g_lines[pline+i].split(' ') for i in range(3)]
+            drp_dict["type"] = "LINK"
+            drp_dict["direction"] = drp_lines[0][1]
+            drp_dict["poly_id"] = int(drp_lines[1][1])
+            drp_dict["vertex"] = int(drp_lines[2][0])
+        elif drp_type == "FIX":
+            drp_dict["type"] = "FIX"
+            drp_line = g_lines[pline].split(' ')
+            drp_dict["direction"] = drp_line[1]
+            drp_dict["length"] = float(drp_line[3])
+        drp_unpacked.append(drp_dict)
+    return drp_unpacked
+
+def repack_drp(unpacked, drp):
+    g_lines = [y for y in (x.strip() for x in unpacked["GEO"].splitlines()) if y]
+    drp_headers = [i for i in range(len(g_lines)) if "DRP1" in g_lines[i]]
+    drop_inds = drp_headers.copy()
+    for pline in drp_headers:
+        if g_lines[pline].split(' ')[2] == "LINK":
+            drop_inds.append(pline+1)
+            drop_inds.append(pline+2)
+    trim_g_lines = [g_lines[i] for i in range(len(g_lines)) if i not in drop_inds]
+    drp_lines = []
+    for i in range(len(drp)):
+        if drp[i]["type"] == "LINK":
+            drp_lines = drp_lines + [f"DRP1 {drp[i]['direction']} LINK", f"POLY {drp[i]['poly_id']} 1", f"{drp[i]['vertex']}"]
+        elif drp[i]["type"] == "FIX":
+            drp_lines.append(f"DRP1 {drp[i]['direction']} FIX {drp[i]['length']}")
+    if len(drop_inds) == 0:
+        drop_inds = [0]
+        
+    new_g_lines = trim_g_lines[:drop_inds[0]] + drp_lines + trim_g_lines[drop_inds[0]:]
+    unpacked["GEO"] = "\n".join(new_g_lines) + "\n"
+    return unpacked
+
+
+
 def repack_son(file_name, unpacked):
     up = copy(unpacked)
     output_string = ""
@@ -765,7 +1007,7 @@ def repack_son(file_name, unpacked):
             for line in unpacked[block]:
                 output_string += line + "\n"
         else:
-            output_string += unpacked[block]
+            output_string += unpacked[block] + "\n"
         output_string += f"END {block}\n"
 
     with open(file_name, "w") as f:
